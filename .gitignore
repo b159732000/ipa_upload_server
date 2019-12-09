@@ -10,6 +10,8 @@
 
 # production
 /build
+/public
+/BK(使用express前的)
 
 # misc
 .DS_Store

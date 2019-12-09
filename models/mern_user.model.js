@@ -15,7 +15,10 @@ const userSchema = new Schema(
         password: {
             type: String,
             required: true,
-        }
+        },
+        projects: [{        // 還不確定array是不是這樣定義，但反正查詢時是可以用的
+            type: String
+        }]
     },
     {   //第二個欄位及設定的參數
         timestamps: true,

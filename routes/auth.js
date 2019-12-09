@@ -5,14 +5,18 @@ const jwt = require('jsonwebtoken');        // 為了回傳Token
 const passport = require('passport');       // 在自訂的passport.js，我們將passport模組附加了個自訂的中間件，以便在資料庫中查找username/password
 const mern_userModel = require('../models/mern_user.model.js');
 
+// @route  POST auth/login
+// @desc   驗證登入，正確即返回Token
+// @params {username: '', password: ''}
+// @access Public (此行目前先忽略)
 // 只有訪問/login，且帳密符合才會從這裡(伺服器)給出Token
 router.route('/login').post((req, res, next) => {
-    console.log('接收到/auth/login POST請求，這句話是從對應的routes傳出的回應');
+    // console.log('接收到/auth/login POST請求，這句話是從對應的routes傳出的回應');
     passport.authenticate(
         'local',                        // 使用本地驗證
         { session: false },             // 一些參數，也可以設定(successRedirect: '/users/profile', failureRedirect: '/users/sigin', failureFlash: true)...等等其他參數
         (err, user, info) => {          // 驗證後的callback (info是傳遞甚麼我暫時不知道，目前也沒用到，先不理)
-            console.log('正在執行訪問/auth/login的passport.authenticate');
+            // console.log('正在執行訪問/auth/login的passport.authenticate');
             // 如果驗證時出錯
             if (err !== null && err !== {} && err !== undefined) {         // 這兩個參數是從我們自訂的passport.js回傳的
                 console.log('err !== null && err !== {} && err !== undefined');
@@ -35,7 +39,7 @@ router.route('/login').post((req, res, next) => {
             }
 
             // 有user且密碼符合才執行
-            // passport提供的登入方法，會建立一個session(在此專案禁用)，可以保持該用戶持續登入的狀態
+            // passport提供的登入方法，會建立一個session(在此專案禁用，此專案用的是返回Token)，可以保持該用戶持續登入的狀態
             req.login(
                 user,                   // 傳入查到的username
                 { session: false },     // 一些參數 (在此我們不建立會話，因為我們用token來驗證是否登入)
@@ -46,7 +50,8 @@ router.route('/login').post((req, res, next) => {
                         return res.josn(err);
                     }
 
-                    const token = jwt.sign({user}, process.env.ATLAS_TOKENSECRET);      // 因為是使用mongoose, 所以必須jwt.sign({物件})或jwt.sign(物件.toJson()
+                    // console.log('要夾帶進Token的資訊(user._id)', user._id);
+                    const token = jwt.sign({_id: user._id}, process.env.ATLAS_TOKENSECRET);      // 因為是使用mongoose, 所以必須jwt.sign({物件})或jwt.sign(物件.toJson()
                     return res.json({ user, token });
                 })
         })
